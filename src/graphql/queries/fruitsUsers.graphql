@@ -1,0 +1,14 @@
+query FruitsUsers($id: Int!) {
+  fruitsUsers(id: $id) {
+    id
+    user {
+      id
+      firstName
+      lastName
+    }
+    fruits {
+      id
+      Fruitsname
+    }
+  }
+}

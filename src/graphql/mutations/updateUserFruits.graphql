@@ -1,0 +1,7 @@
+mutation UpdateUserFruits($updateFruitUsersInput: UpdateFruitUsersInput!) {
+  updateUserFruits(updateFruitUsersInput: $updateFruitUsersInput) {
+    id
+    min
+    max
+  }
+}

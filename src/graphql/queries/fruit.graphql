@@ -1,0 +1,6 @@
+query FruitById($id: Int!) {
+  fruitById(id: $id) {
+    id
+    Fruitsname
+  }
+}

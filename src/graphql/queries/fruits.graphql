@@ -1,0 +1,6 @@
+query Fruits {
+  fruits {
+    id
+    Fruitsname
+  }
+}

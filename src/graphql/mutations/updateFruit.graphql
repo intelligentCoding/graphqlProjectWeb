@@ -1,0 +1,6 @@
+mutation UpdateFruits($id: Int!, $name: String!) {
+  updateFruits(id: $id, name: $name) {
+    id
+    Fruitsname
+  }
+}

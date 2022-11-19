@@ -1,0 +1,7 @@
+mutation CreateFruitUsers($creatFruitUsersInput: CreatFruitUsersInput!) {
+  createFruitUsers(creatFruitUsersInput: $creatFruitUsersInput) {
+    id
+    min
+    max
+  }
+}

@@ -1,0 +1,11 @@
+query PreferenceCreate ($userId: Int!){
+  userById(id: $userId){
+    id
+    max
+    min
+    fruitsByUserId {
+      id
+      Fruitsname
+    }
+  }
+}

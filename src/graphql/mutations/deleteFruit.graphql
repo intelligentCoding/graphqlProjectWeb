@@ -1,0 +1,3 @@
+mutation DeleteFruit($id: Int!) {
+  deleteFruit(id: $id)
+}
