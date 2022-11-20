@@ -1,9 +1,8 @@
 import React from "react";
 import { Formik, Form } from "formik";
-import { Box, Button, FormControl, FormLabel, Select, useToast } from "@chakra-ui/core";
+import { Box, Button, FormControl, useToast } from "@chakra-ui/core";
 import { CustomInput } from "./Input";
-import { CreatFruitUsersInput, useCreateFruitsMutation, useLoginMutation } from "../generated/graphql";
-import { errorMap } from "../utils";
+import { useCreateFruitsMutation} from "../generated/graphql";
 
 interface CreateFruitsProps {
   onClose: () => void
@@ -11,7 +10,6 @@ interface CreateFruitsProps {
 
 export const CreateFruits: React.FC<CreateFruitsProps> = ({onClose}) => {
   const toast = useToast()
-  const toastIdRef = React.useRef()
   const [, createFruits,] = useCreateFruitsMutation()
   const initialValues = {
     Fruitsname: ''

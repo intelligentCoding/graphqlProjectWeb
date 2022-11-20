@@ -1,9 +1,8 @@
 import React, { InputHTMLAttributes } from "react";
 import NextLink from "next/link";
-
-import { useField } from "formik";
-import { FormControl, FormLabel, Input, FormErrorMessage, Textarea, Box, StatGroup, Stat, StatLabel, StatNumber, Link, Heading} from "@chakra-ui/core";
-import { PageWrapper } from "./PageWrapper";
+import { Box, StatGroup, Stat, StatLabel, StatNumber, Link, Heading, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, ModalFooter, useDisclosure} from "@chakra-ui/core";
+import UpdateUser from "./UpdateUser";
+import { useUserQuery } from "../generated/graphql";
 interface Users {
   firstName: string
   lastName: string
@@ -14,10 +13,17 @@ interface Users {
 }
 type UserFruitsProps = InputHTMLAttributes<HTMLInputElement> & {
  user: Users
+ onModalClose: () => void
 };
 
-export const Users: React.FC<UserFruitsProps> = ({user}) => {
-
+export const Users: React.FC<UserFruitsProps> = ({user, onModalClose}) => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [{data, fetching}] = useUserQuery();
+  const finalRef = React.useRef(null)
+  const onModalClosed = () => {
+    onModalClose()
+    onClose()
+  }
   return (
     <>
     <Box
@@ -52,31 +58,27 @@ export const Users: React.FC<UserFruitsProps> = ({user}) => {
             </Link>
           </NextLink>
         </Box>
-        {/* <Box flex={1}> */}
-          {/* {usersData?.user?.id == d.donatorId && (
-            <>
-              <IconButton
-                variantColor="orange"
-                icon="edit"
-                aria-label="Delete Donation"
-                onClick={() => {
-                  router.push(`/donations/edit/${d.id}`);
-                }}
-              />
-              <IconButton
-                variantColor="red"
-                icon="delete"
-                aria-label="Delete Donation"
-                onClick={async () => {
-                  await deleteDonation({
-                    id: d.id,
-                  });
-                  router.push("/");
-                }}
-              />
-            </>
-          )} */}
-        {/* </Box> */}
+        {data?.user.isAdmin && (
+        <Button color="black" ml={2} mt={4} onClick={onOpen}>
+            Edit
+          </Button>
+        )}
+          <Modal size="xl" finalFocusRef={finalRef} isOpen={isOpen} onClose={onModalClosed}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Add Fruit Preferences</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <UpdateUser min={user.min} max={user.max} userId={user.id} onClose={onModalClosed}/>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button mr={3} onClick={onClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </StatGroup>
     </Box>
   </>

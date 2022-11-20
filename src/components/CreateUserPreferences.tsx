@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form, Field } from "formik";
-import { Badge, Box, Button, FormControl, FormLabel, Select, Stat, StatGroup, StatLabel, StatNumber } from "@chakra-ui/core";
+import { Badge, Box, Button, FormControl, FormLabel, Select, Stat, StatGroup, StatLabel, StatNumber, useToast } from "@chakra-ui/core";
 import { PageWrapper } from "./PageWrapper";
 import { CustomInput } from "./Input";
-import { CreatFruitUsersInput, useCreateFruitUsersMutation, useFruitsQuery, useLoginMutation, usePreferenceCreateQuery } from "../generated/graphql";
+import { CreatFruitUsersInput, useCreateFruitUsersMutation, useFruitsQuery, useLoginMutation, usePreferenceCreateQuery, UserFruitByIdDocument } from "../generated/graphql";
 import { errorMap } from "../utils";
 import { useRouter } from "next/router";
 import { NavBar } from "./Navbar";
 import { UserFruit, UserFruitProps } from "./UserFruit";
+import { fetchExchange } from "urql";
 interface TotalMinMax {
   min: number
   max: number
@@ -20,6 +21,8 @@ interface CreateUserPreferencesProps {
 }
 
 export const CreateUserPreferences: React.FC<CreateUserPreferencesProps> = ({ userFruit, userId, onClose, totalMinMax }) => {
+  const toast = useToast();
+
   const [{ data, fetching }] = usePreferenceCreateQuery({
     variables: {
       userId
@@ -44,35 +47,38 @@ export const CreateUserPreferences: React.FC<CreateUserPreferencesProps> = ({ us
     <>
       <Formik
         initialValues={initialValues}
-        onSubmit={async (values, { setFieldError, setSubmitting, setErrors }) => {
+        validate={ (values) => {
+          const errors: any = {}
           if (values.max < values.min) {
-            setFieldError('max', "Max value can not be less than min value")
-            setSubmitting(false)
+            errors.max = "Max value can not be less than min value"
+            setIsError(true)
           }
           if (values.max <= 0) {
-            setFieldError('max', "Max value can not be zero")
-            setSubmitting(false)
+            errors.max = "Max value can not be zero"
+
+            setIsError(true)
           }
           if (values.min <= 0) {
-            setFieldError('min', "min value can not be zero")
-            setSubmitting(false)
+            errors.min =  "min value can not be zero"
+            setIsError(true)
           }
 
           if ((values.max + totalMinMax.max) > data!.userById!.max) {
-            setFieldError('max', 'The maximum amount exceeds users per week maximum preference')
-            setSubmitting(false)
-
+            errors.max = 'The maximum amount exceeds users per week maximum preference'
+            setIsError(true)
           }
           if ((values.min + totalMinMax.min) > data!.userById!.min) {
-            setFieldError('min', 'The minimum amount exceeds users minimum per week limit')
-            setSubmitting(false)
+            errors.min =  'The minimum amount exceeds users minimum per week limit'
+            setIsError(true)
           }
           if (values.fruitId === 0) {
-            setFieldError('fruitId', 'Must select a fruit')
-            setSubmitting(false)
-            setIsError((prev) => !prev)
+            errors.fruitId = 'Must select a fruit'
+            setIsError(true)
           }
-          if (!isError) {
+          return errors
+        }}
+        onSubmit={async (values, {setSubmitting}) => {
+
             try {
               const response = await createFruitUsers({
                 creatFruitUsersInput: {
@@ -80,21 +86,22 @@ export const CreateUserPreferences: React.FC<CreateUserPreferencesProps> = ({ us
                   max: values.max,
                   fruitId: Number(values.fruitId),
                   userId: values.userId
-                }  
-              })
+                } 
+              },
+              )
               if (response.error) {
                 let message = response.error?.message
                 toast({ description: message || "There was an error saving the preference", status: 'error' })
-              } else{
+              } else {
+                toast({ description: "Succesfully create preference", status: 'success' })
                 onClose()
               }
+
               
             } catch (error) {
               console.log(error)
               toast({ description: "Error saving Preference", status: 'error' })
             }
-
-          }
         }}
       >
         {({ isSubmitting, errors }) => {
@@ -171,7 +178,5 @@ export const CreateUserPreferences: React.FC<CreateUserPreferencesProps> = ({ us
 };
 //in next.js have to export default component
 export default CreateUserPreferences;
-function toast(arg0: { description: string; status: string; }) {
-  throw new Error("Function not implemented.");
-}
+
 

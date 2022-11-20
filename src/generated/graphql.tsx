@@ -12,6 +12,12 @@ export type Scalars = {
   Float: number;
 };
 
+export type AuthResponse = {
+  __typename?: 'AuthResponse';
+  user: User;
+  isAdmin: Scalars['Boolean'];
+};
+
 export type CreatFruitUsersInput = {
   userId: Scalars['Float'];
   fruitId: Scalars['Float'];
@@ -39,6 +45,7 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  updateUser: User;
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -48,6 +55,13 @@ export type Mutation = {
   updateUserFruits: UserFruits;
   createFruitUsers: UserFruits;
   deleteFruitUsers: Scalars['Boolean'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  max: Scalars['Int'];
+  min: Scalars['Int'];
+  userId: Scalars['Int'];
 };
 
 
@@ -94,7 +108,7 @@ export type MutationDeleteFruitUsersArgs = {
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
-  user?: Maybe<User>;
+  user: AuthResponse;
   userById?: Maybe<User>;
   users?: Maybe<Array<User>>;
   fruits: Array<Fruits>;
@@ -130,6 +144,7 @@ export type RegisterInput = {
   lastName: Scalars['String'];
   min: Scalars['Float'];
   max: Scalars['Float'];
+  isAdmin: Scalars['Boolean'];
 };
 
 export type UpdateFruitUsersInput = {
@@ -247,6 +262,7 @@ export type RegisterMutationVariables = Exact<{
   password: Scalars['String'];
   min: Scalars['Float'];
   max: Scalars['Float'];
+  isAdmin: Scalars['Boolean'];
 }>;
 
 
@@ -275,6 +291,21 @@ export type UpdateFruitsMutation = (
   & { updateFruits: (
     { __typename?: 'Fruits' }
     & Pick<Fruits, 'id' | 'Fruitsname'>
+  ) }
+);
+
+export type UpdateUserMutationVariables = Exact<{
+  userId: Scalars['Int'];
+  min: Scalars['Int'];
+  max: Scalars['Int'];
+}>;
+
+
+export type UpdateUserMutation = (
+  { __typename?: 'Mutation' }
+  & { updateUser: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'min' | 'max'>
   ) }
 );
 
@@ -357,10 +388,14 @@ export type UserQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type UserQuery = (
   { __typename?: 'Query' }
-  & { user?: Maybe<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'username'>
-  )> }
+  & { user: (
+    { __typename?: 'AuthResponse' }
+    & Pick<AuthResponse, 'isAdmin'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    ) }
+  ) }
 );
 
 export type UserByIdQueryVariables = Exact<{
@@ -480,9 +515,9 @@ export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RegisterDocument = gql`
-    mutation Register($firstName: String!, $lastName: String!, $username: String!, $password: String!, $min: Float!, $max: Float!) {
+    mutation Register($firstName: String!, $lastName: String!, $username: String!, $password: String!, $min: Float!, $max: Float!, $isAdmin: Boolean!) {
   register(
-    options: {firstName: $firstName, lastName: $lastName, username: $username, password: $password, min: $min, max: $max}
+    options: {firstName: $firstName, lastName: $lastName, username: $username, password: $password, min: $min, max: $max, isAdmin: $isAdmin}
   ) {
     errors {
       field
@@ -511,6 +546,19 @@ export const UpdateFruitsDocument = gql`
 
 export function useUpdateFruitsMutation() {
   return Urql.useMutation<UpdateFruitsMutation, UpdateFruitsMutationVariables>(UpdateFruitsDocument);
+};
+export const UpdateUserDocument = gql`
+    mutation UpdateUser($userId: Int!, $min: Int!, $max: Int!) {
+  updateUser(userId: $userId, min: $min, max: $max) {
+    id
+    min
+    max
+  }
+}
+    `;
+
+export function useUpdateUserMutation() {
+  return Urql.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument);
 };
 export const UpdateUserFruitsDocument = gql`
     mutation UpdateUserFruits($updateFruitUsersInput: UpdateFruitUsersInput!) {
@@ -589,8 +637,11 @@ export function usePreferenceCreateQuery(options: Omit<Urql.UseQueryArgs<Prefere
 export const UserDocument = gql`
     query User {
   user {
-    id
-    username
+    user {
+      id
+      username
+    }
+    isAdmin
   }
 }
     `;

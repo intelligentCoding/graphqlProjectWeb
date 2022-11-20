@@ -1,9 +1,5 @@
-import React, { InputHTMLAttributes } from "react";
-import NextLink from "next/link";
-
-import { useField } from "formik";
-import { FormControl, FormLabel, Input, FormErrorMessage, Textarea, Box, StatGroup, Stat, StatLabel, StatNumber, Link, Heading, Button} from "@chakra-ui/core";
-import { PageWrapper } from "./PageWrapper";
+import React from "react";
+import { Box, StatGroup, Stat, StatLabel, StatNumber} from "@chakra-ui/core";
 
 export interface UserFruitProps {
   id: number

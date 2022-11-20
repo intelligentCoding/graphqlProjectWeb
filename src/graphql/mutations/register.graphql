@@ -5,6 +5,7 @@ mutation Register(
   $password: String!
   $min: Float!
   $max: Float!
+  $isAdmin: Boolean!
 ) {
   register(
     options: {
@@ -14,6 +15,7 @@ mutation Register(
       password: $password
       min: $min
       max: $max
+      isAdmin: $isAdmin
     }
   ) {
     errors {

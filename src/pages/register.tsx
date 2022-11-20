@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Form } from "formik";
+import { Formik, Form, Field } from "formik";
 import {
   Box,
   Button,
@@ -28,6 +28,7 @@ export const Register: React.FC<registerProps> = ({}) => {
             password: "",
             min: 0,
             max: 0,
+            isAdmin: false
           }}
           onSubmit={async (values, { setErrors }) => {
             const response = await register(values);
@@ -76,6 +77,8 @@ export const Register: React.FC<registerProps> = ({}) => {
                   placeholder="Please enter max value"
                   label="max"
                 />
+                                is admin?
+                <Field type="checkbox" name="isAdmin" />
                 <Box mt={6}>
                   <Button
                     isLoading={isSubmitting}

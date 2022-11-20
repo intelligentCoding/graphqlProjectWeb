@@ -1,6 +1,9 @@
 query User {
   user {
-    id
-    username
+    user {
+      id
+      username
+    }
+    isAdmin
   }
 }

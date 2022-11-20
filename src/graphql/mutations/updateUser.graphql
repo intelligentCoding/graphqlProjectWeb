@@ -1,0 +1,7 @@
+mutation UpdateUser($userId: Int!, $min: Int!, $max: Int!) {
+  updateUser(userId: $userId, min: $min, max: $max) {
+    id
+    min,
+    max,
+  }
+}

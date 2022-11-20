@@ -1,7 +1,7 @@
-import { Box, Button, Flex, Heading, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/core"
+import { Box, Button, Flex, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/core"
 import NextLink from "next/link";
 import { useUserQuery, useLogoutMutation } from '../generated/graphql';
-import router, { useRouter } from 'next/router'
+import router from 'next/router'
 import React from "react";
 import CreateFruits from "./CreateFruits";
 
@@ -18,7 +18,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     let navBody = null;
 
     if(fetching) {
-    } else if(!data?.user){
+    } else if(!data?.user?.user){
         navBody = (
             <>
                 <NextLink href="/login">
@@ -33,12 +33,17 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         navBody = (
           <>
             <Flex align="center">
+              {data.user.isAdmin && (
+
                 <Button onClick={onOpen} mr={4}>
                   Add Fruits 
                 </Button>
-
+              )}
+                <Button onClick={()=> router.push("/")} mr={4}>
+                  Home 
+                </Button>
               <Box mr={2} color="white">
-                Welcome {data.user.username}
+                Welcome {data.user.user.username}
               </Box>
 
               <Button
